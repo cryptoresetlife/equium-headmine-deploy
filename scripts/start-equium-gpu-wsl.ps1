@@ -4,7 +4,8 @@ param(
   [int]$Threads = -1,
   [int]$MaxBlocks = -1,
   [string]$Backend = "",
-  [switch]$FullGpu
+  [switch]$FullGpu,
+  [switch]$DryRun
 )
 
 . "$PSScriptRoot\common.ps1"
@@ -72,5 +73,9 @@ if ($useFullGpu) {
 }
 
 $wslArgs = @("--cd", (Expand-WslPath (Get-ProjectDir)), "--") + $mineCommand
+if ($DryRun) {
+  Write-Host "Dry run. Command not started:"
+  Write-Host ("wsl.exe " + ($wslArgs -join " "))
+  return
+}
 & wsl.exe @wslArgs
-
