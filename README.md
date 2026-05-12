@@ -79,6 +79,20 @@ This repo intentionally does not contain:
    Only set `EQUIUM_GPU_FULL = "1"` after `equium-gpu-miner verify-rounds`
    passes on that machine.
 
+Multi-lane GPU mining:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start-equium-gpu-multi-wsl.ps1
+```
+
+This starts `EQUIUM_GPU_MULTI_LANES` GPU miner processes and opens a monitor
+window that sums the latest H/s from each lane. It does not stop an existing
+CPU miner. Stop only the GPU lanes with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\stop-equium-gpu-multi-wsl.ps1
+```
+
 CPU fallback:
 
    ```powershell

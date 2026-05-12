@@ -15,6 +15,10 @@ $env:EQUIUM_MAX_BLOCKS = "0"
 # verify-rounds passes on that machine.
 $env:EQUIUM_GPU_BACKEND = ""
 $env:EQUIUM_GPU_FULL = "0"
+$env:EQUIUM_GPU_MULTI_LANES = "16"
+$env:EQUIUM_GPU_MULTI_FULL = "1"
+$env:EQUIUM_GPU_THREADS_PER_LANE = "1"
+$env:EQUIUM_GPU_MULTI_LOG_DIR = "~/.config/equium/gpu-multi"
 
 # WSL keypair path. Import the private key with:
 # .\scripts\import-official-wallet.ps1
