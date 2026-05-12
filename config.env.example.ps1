@@ -10,6 +10,12 @@ $env:EQUIUM_THREADS = "0"
 # 0 means run forever.
 $env:EQUIUM_MAX_BLOCKS = "0"
 
+# GPU miner settings. Leave backend blank to auto-probe. If WSL Vulkan fails
+# but GL works, set this to "gl". Set EQUIUM_GPU_FULL to "1" only after
+# verify-rounds passes on that machine.
+$env:EQUIUM_GPU_BACKEND = ""
+$env:EQUIUM_GPU_FULL = "0"
+
 # WSL keypair path. Import the private key with:
 # .\scripts\import-official-wallet.ps1
 $env:EQUIUM_KEYPAIR = "~/.config/equium/official-id.json"
@@ -20,4 +26,3 @@ $env:EQUIUM_EXPECTED_PUBKEY = "YOUR_SOLANA_WALLET_ADDRESS"
 # Build/source settings.
 $env:EQUIUM_UPSTREAM_REPO = "https://github.com/HannaPrints/equium.git"
 $env:EQUIUM_WSL_PROJECT_DIR = "~/equium-headmine"
-

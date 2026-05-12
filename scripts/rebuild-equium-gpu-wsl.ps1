@@ -4,29 +4,18 @@ Import-EquiumConfig
 $repo = if ($env:EQUIUM_UPSTREAM_REPO) { $env:EQUIUM_UPSTREAM_REPO } else { "https://github.com/HannaPrints/equium.git" }
 $projectDir = Get-ProjectDir
 
-$bootstrap = @'
+$rebuild = @'
 set -euo pipefail
 
 repo="$1"
 project_dir="$2"
-
-if ! command -v git >/dev/null 2>&1 || ! command -v gcc >/dev/null 2>&1 || ! command -v perl >/dev/null 2>&1 || ! command -v make >/dev/null 2>&1 || ! command -v vulkaninfo >/dev/null 2>&1; then
-  echo "Installing WSL build dependencies..."
-  sudo apt-get update
-  sudo apt-get install -y build-essential perl pkg-config git curl ca-certificates python3 libvulkan1 mesa-vulkan-drivers vulkan-tools
-fi
-
-if ! command -v cargo >/dev/null 2>&1; then
-  echo "Installing Rust toolchain..."
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-fi
-
 export PATH="$HOME/.cargo/bin:$PATH"
-
 project_dir="${project_dir/#\~/$HOME}"
+
 if [ ! -d "$project_dir/.git" ]; then
   git clone "$repo" "$project_dir"
 else
+  git -C "$project_dir" stash push -m equium-deploy-gpu-build-patch -- clients/cli-miner/Cargo.toml clients/gpu-miner/Cargo.toml Cargo.lock >/dev/null || true
   git -C "$project_dir" pull --ff-only
 fi
 
@@ -45,16 +34,15 @@ def add_line(manifest: Path, marker: str):
         raise SystemExit(f"could not find dependency marker in {manifest}")
     manifest.write_text(text.replace(marker, marker + line + "\n"))
 
-add_line(project / "clients" / "cli-miner" / "Cargo.toml", 'solana-program = { workspace = true }\n')
 add_line(project / "clients" / "gpu-miner" / "Cargo.toml", 'solana-client = "2.1"\n')
 PY
 
-cargo build --manifest-path "$project_dir/Cargo.toml" -p equium-cli-miner --release
 cargo build --manifest-path "$project_dir/Cargo.toml" -p equium-gpu-miner --release
-"$project_dir/target/release/equium-miner" --version
+"$project_dir/target/release/equium-gpu-miner" verify-cpu
 "$project_dir/target/release/equium-gpu-miner" --version
 '@
 
-$bootstrapB64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($bootstrap))
-$cmd = "printf '%s' '$bootstrapB64' | base64 -d | bash -s -- '$repo' '$projectDir'"
+$rebuildB64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($rebuild))
+$cmd = "printf '%s' '$rebuildB64' | base64 -d | bash -s -- '$repo' '$projectDir'"
 wsl.exe -- bash -lc $cmd
+
