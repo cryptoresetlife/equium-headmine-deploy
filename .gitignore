@@ -1,0 +1,14 @@
+config.env.ps1
+*.log
+*.tmp
+__pycache__/
+.python-version
+
+# Never commit wallet material.
+*.json
+*.key
+*.pem
+id.json
+official-id.json
+official-address.txt
+
